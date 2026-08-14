@@ -8,7 +8,7 @@
 
     <application
         android:allowBackup="true"
-        android:label="JARVImS"
+        android:label="JARVIS"
         android:theme="@style/AppTheme">
 
         <activity
@@ -19,7 +19,7 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-nnnnnn
+
         </activity>
 
         <service
@@ -30,4 +30,4 @@ nnnnnn
 
     </application>
 
-</manifest>n
+</manifest>
