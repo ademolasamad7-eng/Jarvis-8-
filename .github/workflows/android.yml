@@ -13,7 +13,7 @@ jobs:
       - name: Checkout project
         uses: actions/checkout@v4
 
-      - name: Set up JDK 11
+      - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -23,6 +23,17 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.7'
+
+      - name: Download Vosk English voice model
+        run: |
+          mkdir -p app/src/main/assets/model-en-us
+          curl -L --fail --retry 3 \
+            https://alphacephei.com/vosk/models/vosk-model-small-en-us-0.15.zip \
+            -o /tmp/vosk-model.zip
+          unzip -q /tmp/vosk-model.zip -d /tmp/vosk-model
+          cp -R /tmp/vosk-model/vosk-model-small-en-us-0.15/. \
+            app/src/main/assets/model-en-us/
+          rm -rf /tmp/vosk-model /tmp/vosk-model.zip
 
       - name: Build APK
         run: gradle assembleDebug
