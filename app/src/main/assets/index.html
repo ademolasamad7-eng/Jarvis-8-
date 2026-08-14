@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, user-scalable=no">
+
+    <title>JARVIS</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background: #05070d;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 25px;
+        }
+
+        .title {
+            font-size: 42px;
+            font-weight: bold;
+            letter-spacing: 8px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            opacity: 0.65;
+            letter-spacing: 3px;
+            margin-bottom: 45px;
+        }
+
+        .arc {
+            width: 210px;
+            height: 210px;
+            border-radius: 50%;
+            border: 3px solid rgba(0, 180, 255, 0.35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow:
+                0 0 20px rgba(0, 180, 255, 0.25),
+                inset 0 0 20px rgba(0, 180, 255, 0.15);
+        }
+
+        .core {
+            width: 105px;
+            height: 105px;
+            border-radius: 50%;
+            border: 3px solid #00b7ff;
+            box-shadow:
+                0 0 25px #00b7ff,
+                inset 0 0 25px rgba(0,183,255,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 34px;
+        }
+
+        .listening .arc {
+            animation: pulse 1.2s infinite;
+            border-color: #00ffcc;
+        }
+
+        .listening .core {
+            border-color: #00ffcc;
+            box-shadow:
+                0 0 35px #00ffcc,
+                inset 0 0 25px rgba(0,255,204,0.5);
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.06);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .status {
+            margin-top: 35px;
+            font-size: 16px;
+            letter-spacing: 2px;
+            text-align: center;
+            min-height: 24px;
+        }
+
+        .transcript {
+            width: 100%;
+            min-height: 80px;
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid rgba(0,183,255,0.25);
+            border-radius: 12px;
+            background: rgba(0,183,255,0.05);
+            text-align: center;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        button {
+            border: 1px solid #00b7ff;
+            background: rgba(0,183,255,0.08);
+            color: white;
+            border-radius: 30px;
+            padding: 13px 25px;
+            font-size: 15px;
+        }
+
+        button:active {
+            transform: scale(0.95);
+            background: rgba(0,183,255,0.25);
+        }
+
+        .footer {
+            position: absolute;
+            bottom: 20px;
+            font-size: 11px;
+            opacity: 0.4;
+            letter-spacing: 2px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container" id="jarvis">
+
+    <div class="title">JARVIS</div>
+
+    <div class="subtitle">
+        ANDROID VOICE ASSISTANT
+    </div>
+
+    <div class="arc">
+        <div class="core">J</div>
+    </div>
+
+    <div class="status" id="status">
+        INITIALIZING...
+    </div>
+
+    <div class="transcript" id="transcript">
+        Voice system starting...
+    </div>
+
+    <div class="buttons">
+        <button onclick="startListening()">LISTEN</button>
+        <button onclick="stopListening()">STOP</button>
+    </div>
+
+    <div class="footer">
+        JARVIS 8
+    </div>
+
+</div>
+
+<script>
+
+    const app = document.getElementById("jarvis");
+    const statusText = document.getElementById("status");
+    const transcript = document.getElementById("transcript");
+
+    function setStatus(text) {
+        statusText.textContent = text;
+    }
+
+    function startListening() {
+
+        if (window.AndroidJarvis &&
+            typeof AndroidJarvis.startListening === "function") {
+
+            AndroidJarvis.startListening();
+
+            app.classList.add("listening");
+            setStatus("LISTENING...");
+            transcript.textContent = "I'm listening.";
+        } else {
+            setStatus("VOICE BRIDGE UNAVAILABLE");
+        }
+    }
+
+    function stopListening() {
+
+        if (window.AndroidJarvis &&
+            typeof AndroidJarvis.stopListening === "function") {
+
+            AndroidJarvis.stopListening();
+        }
+
+        app.classList.remove("listening");
+        setStatus("READY");
+        transcript.textContent = "Voice listening stopped.";
+    }
+
+    function speak(text) {
+
+        if (!text) return;
+
+        if (window.AndroidJarvis &&
+            typeof AndroidJarvis.speak === "function") {
+
+            AndroidJarvis.speak(text);
+        }
+    }
+
+    window.jarvisNativeTranscript = function(text) {
+
+        app.classList.remove("listening");
+
+        setStatus("COMMAND RECEIVED");
+        transcript.textContent = text || "";
+
+        setTimeout(function() {
+            setStatus("READY");
+        }, 2000);
+    };
+
+    window.jarvisPermissionGranted = function() {
+
+        setStatus("READY");
+        transcript.textContent =
+            "Microphone permission granted. JARVIS is ready.";
+    };
+
+    window.jarvisPermissionDenied = function() {
+
+        setStatus("MICROPHONE REQUIRED");
+        transcript.textContent =
+            "Microphone permission is required for voice control.";
+    };
+
+    window.jarvisNativeError = function(message) {
+
+        app.classList.remove("listening");
+
+        setStatus("VOICE ERROR");
+        transcript.textContent =
+            message || "Voice service could not start.";
+    };
+
+    window.addEventListener("load", function() {
+
+        setTimeout(function() {
+
+            if (window.AndroidJarvis &&
+                typeof AndroidJarvis.hasMicrophonePermission === "function") {
+
+                if (AndroidJarvis.hasMicrophonePermission()) {
+
+                    setStatus("READY");
+                    transcript.textContent =
+                        "JARVIS is ready. Say your wake word or tap LISTEN.";
+
+                } else {
+
+                    setStatus("MICROPHONE PERMISSION");
+                    transcript.textContent =
+                        "Please allow microphone access.";
+                }
+
+            } else {
+
+                setStatus("READY");
+                transcript.textContent =
+                    "JARVIS interface loaded.";
+
+            }
+
+        }, 700);
+    });
+
+</script>
+
+</body>
+  </html>
